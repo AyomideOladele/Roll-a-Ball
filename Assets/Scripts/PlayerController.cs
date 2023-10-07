@@ -1,7 +1,7 @@
 using System.Collections;
-using System . Collections . Generic ;
-using UnityEngine ;
-using UnityEngine . InputSystem ;
+using System . Collections . Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,7 +16,8 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 movement = new Vector3(moveValue.x, 0.0f, moveValue.y);
-        GetComponent<Rigidbody>().AddForce(speed * Time.fixedDeltaTime * movement);
+
+        GetComponent<Rigidbody>().AddForce(movement * speed * Time.fixedDeltaTime);
     }
 }
 
