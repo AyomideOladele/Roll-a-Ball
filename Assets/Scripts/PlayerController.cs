@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 using System.Collections;
-using System . Collections . Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
@@ -12,14 +12,27 @@ public class PlayerController : MonoBehaviour
     public float speed;
     private int count;
     private int numPickUps = 5; // Must equals number of pickUp objects in hierarchy/scene/game
+    private Vector3 OldPosition;
+    private Vector3 Position;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI winText;
+    public TextMeshProUGUI playersPositionText;
+    public TextMeshProUGUI playersVelocityText;
 
     void Start()
     {
+        OldPosition = transform.position;
         count = 0;
         winText.text = "";
         SetCountText();
+        SetPlayersPosition();
+        SetPlayersVelocity();
+
+    }
+
+    private void Update()
+    {
+        SetPlayersPosition();
     }
 
     void OnMove(InputValue value)
@@ -29,11 +42,14 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        Position = transform.position;
+        SetPlayersVelocity();
+        OldPosition = transform.position;
         Vector3 movement = new Vector3(moveValue.x, 0.0f, moveValue.y);
 
         GetComponent<Rigidbody>().AddForce(movement * speed * Time.fixedDeltaTime);
     }
-    
+
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "PickUp")
@@ -47,11 +63,21 @@ public class PlayerController : MonoBehaviour
     private void SetCountText()
     {
         scoreText.text = "Score: " + count.ToString();
-        if(count >= numPickUps)
+        if (count >= numPickUps)
         {
             winText.text = "You win!";
         }
     }
+
+    private void SetPlayersPosition()
+    {
+        playersPositionText.text = "Players Position: " + gameObject.transform.position.ToString();
+    }
+    private void SetPlayersVelocity()
+    {
+        playersVelocityText.text = "Players Velocity: " + ((Position - OldPosition) / Time.deltaTime).magnitude.ToString("0.00");
+    }
+
 }
 
 

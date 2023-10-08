@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18386999, g: 0.22901867, b: 0.30311197, a: 1}
+  m_IndirectSpecularColor: {r: 0.18387045, g: 0.22901933, b: 0.30311313, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -374,7 +374,7 @@ GameObject:
   - component: {fileID: 385634012}
   - component: {fileID: 385634011}
   m_Layer: 5
-  m_Name: PlayerPosition
+  m_Name: PlayersPositionText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -718,6 +718,8 @@ MonoBehaviour:
   speed: 500
   scoreText: {fileID: 805578705}
   winText: {fileID: 1982619196}
+  playersPositionText: {fileID: 385634011}
+  playersVelocityText: {fileID: 1667249693}
 --- !u!54 &675104337
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -757,7 +759,7 @@ GameObject:
   - component: {fileID: 777305344}
   - component: {fileID: 777305343}
   m_Layer: 5
-  m_Name: Closest Pickup
+  m_Name: Closest PickupText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -779,7 +781,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 110.6, y: 50}
+  m_AnchoredPosition: {x: 110.6, y: 90}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &777305343
@@ -1765,7 +1767,7 @@ GameObject:
   - component: {fileID: 1667249694}
   - component: {fileID: 1667249693}
   m_Layer: 5
-  m_Name: PlayerVelocity
+  m_Name: PlayersVelocityText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
