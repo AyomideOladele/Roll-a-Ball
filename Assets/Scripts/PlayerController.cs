@@ -12,21 +12,27 @@ public class PlayerController : MonoBehaviour
     public float speed;
     private int count;
     private int numPickUps = 5; // Must equals number of pickUp objects in hierarchy/scene/game
+    private float ClosestPickUp;
+    private GameObject[]PickUp;
     private Vector3 OldPosition;
     private Vector3 Position;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI winText;
     public TextMeshProUGUI playersPositionText;
     public TextMeshProUGUI playersVelocityText;
+    public TextMeshProUGUI closestPickupText;
 
     void Start()
     {
         OldPosition = transform.position;
         count = 0;
         winText.text = "";
+        ClosestPickUp = 1000;
+        PickUp = GameObject.FindGameObjectsWithTag("PickUp");
         SetCountText();
         SetPlayersPosition();
         SetPlayersVelocity();
+        GetClosestTarget();
 
     }
 
@@ -44,6 +50,8 @@ public class PlayerController : MonoBehaviour
     {
         Position = transform.position;
         SetPlayersVelocity();
+        ClosestPickUp = 1000;
+        GetClosestTarget();
         OldPosition = transform.position;
         Vector3 movement = new Vector3(moveValue.x, 0.0f, moveValue.y);
 
@@ -73,9 +81,25 @@ public class PlayerController : MonoBehaviour
     {
         playersPositionText.text = "Players Position: " + gameObject.transform.position.ToString();
     }
+
     private void SetPlayersVelocity()
     {
         playersVelocityText.text = "Players Velocity: " + ((Position - OldPosition) / Time.deltaTime).magnitude.ToString("0.00");
+    }
+
+    private void GetClosestTarget()
+    {
+        for (int i = 0; i < PickUp.Length; i++)
+        {
+            if ((PickUp[i].transform.position-gameObject.transform.position).magnitude < ClosestPickUp)
+            {
+                if (PickUp[i].activeInHierarchy)
+                {
+                    ClosestPickUp = (PickUp[i].transform.position - gameObject.transform.position).magnitude;
+                }
+            }
+        }
+        closestPickupText.text = "Distance to Closest Pick up: "+ ClosestPickUp.ToString("0.00");
     }
 
 }
