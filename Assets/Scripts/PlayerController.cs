@@ -191,7 +191,7 @@ public class PlayerController : MonoBehaviour
         {
             if (n == min)
             {
-                PickUp[n].GetComponent<Renderer>().material.color = Color.blue;
+                PickUp[n].GetComponent<Renderer>().material.color = Color.magenta;
                 PickUp[n].transform.LookAt(transform.position);
             }
             else
