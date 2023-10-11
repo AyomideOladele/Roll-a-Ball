@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
-
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,9 +13,14 @@ public class PlayerController : MonoBehaviour
     private int count;
     private int numPickUps = 5; // Must equals number of pickUp objects in hierarchy/scene/game
     private float ClosestPickUp;
+    private GameObject ClosestPickUpLocation;
     private GameObject[]PickUp;
     private Vector3 OldPosition;
     private Vector3 Position;
+    private float minDistance;
+    private Color PickUpColour;
+    private string mode;
+    private LineRenderer lineRenderer;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI winText;
     public TextMeshProUGUI playersPositionText;
@@ -29,16 +34,48 @@ public class PlayerController : MonoBehaviour
         winText.text = "";
         ClosestPickUp = 1000;
         PickUp = GameObject.FindGameObjectsWithTag("PickUp");
+        PickUpColour = new Vector4(1f, 0.7129012f, 0f);
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+        lineRenderer.enabled = false;
+        playersPositionText.text = "";
+        playersVelocityText.text = "";
+        closestPickupText.text = "";
         SetCountText();
-        SetPlayersPosition();
-        SetPlayersVelocity();
-        GetClosestTarget();
-
     }
 
-    private void Update()
+    private enum Debugmode
     {
-        SetPlayersPosition();
+        Normal,
+        Distance,
+        Vision
+    }
+
+    private Debugmode debugmode;
+
+    void OnSwapMode()
+    {
+        if (debugmode == Debugmode.Normal)
+        {
+            debugmode = Debugmode.Distance;
+            playersPositionText.enabled = true;
+            playersVelocityText.enabled = true;
+            closestPickupText.enabled = true;
+            lineRenderer.enabled = true;
+        }
+        else if (debugmode == Debugmode.Distance)
+        {
+            debugmode = Debugmode.Vision;
+            playersPositionText.enabled = false;
+            playersVelocityText.enabled = false;
+            closestPickupText.enabled = false;
+        }
+        else if (debugmode == Debugmode.Vision)
+        {
+            debugmode = Debugmode.Normal;
+            lineRenderer.enabled = false;
+        }
     }
 
     void OnMove(InputValue value)
@@ -48,10 +85,22 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        for (int i = 0; i < PickUp.Length; i++)
+        {
+            PickUp[i].GetComponent<Renderer>().material.color = PickUpColour;
+        }
         Position = transform.position;
-        SetPlayersVelocity();
         ClosestPickUp = 1000;
-        GetClosestTarget();
+        if (debugmode == Debugmode.Distance)
+        {
+            SetPlayersPosition();
+            SetPlayersVelocity();
+            GetClosestTarget();
+        }
+        else if(debugmode == Debugmode.Vision)
+        {
+            mode3();
+        }
         OldPosition = transform.position;
         Vector3 movement = new Vector3(moveValue.x, 0.0f, moveValue.y);
 
@@ -96,10 +145,64 @@ public class PlayerController : MonoBehaviour
                 if (PickUp[i].activeInHierarchy)
                 {
                     ClosestPickUp = (PickUp[i].transform.position - gameObject.transform.position).magnitude;
+                    ClosestPickUpLocation = PickUp[i];
                 }
             }
         }
         closestPickupText.text = "Distance to Closest Pick up: "+ ClosestPickUp.ToString("0.00");
+        lineRenderer.SetPosition(0, transform.position);
+        lineRenderer.SetPosition(1, ClosestPickUpLocation.transform.position);
+        ClosestPickUpLocation.GetComponent<Renderer>().material.color = Color.blue;
+    }
+
+    private float CountDistance(Vector3 d1, Vector3 d2)
+    {
+        float distance = 0;
+        distance = (float)Math.Pow(Math.Pow((d1.x - d2.x), 2) + Math.Pow((d1.z - d2.z),2),0.5);
+        return distance;
+    }
+
+    private float CountDistance2(Vector3 d1, Vector3 d2)
+    {
+        float distance = 0;
+        distance = (float)(Math.Pow((d1.x * d2.z - d2.x * d1.z), 0.5) / Math.Pow(Math.Pow(d1.x, 2) + Math.Pow(d1.z, 2), 0.5));
+        return distance;
+    }
+
+    private void mode3()
+    {
+        Vector3 towards = (transform.position - OldPosition) * 50;
+
+        minDistance = 999999;
+        int min = 9;
+        for (int n=0; n < PickUp.Length; n++)
+        {
+            if (PickUp[n].activeInHierarchy)
+            {
+                if (CountDistance2(towards, PickUp[n].transform.position - transform.position) <= minDistance && (towards.x * (PickUp[n].transform.position - transform.position).x + towards.z * (PickUp[n].transform.position - transform.position).z) >= 0)
+                {
+                    minDistance = CountDistance2(towards, PickUp[n].transform.position - transform.position);
+                    min = n;
+                }
+            }
+        }
+
+        for (int n=0;n < PickUp.Length;n++)
+        {
+            if (n == min)
+            {
+                PickUp[n].GetComponent<Renderer>().material.color = Color.blue;
+                PickUp[n].transform.LookAt(transform.position);
+            }
+            else
+            {
+                PickUp[n].GetComponent<Renderer>().material.color = PickUpColour;
+            }
+        }
+
+        lineRenderer.SetPosition(0, transform.position);
+        lineRenderer.SetPosition(1, transform.position + towards);
+
     }
 
 }
